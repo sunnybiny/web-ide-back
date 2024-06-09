@@ -12,7 +12,7 @@
 || 최해인 | 코드 실행 기능 구현 ||
 
 ## 기술스텍
-[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1717940483627?alt=media&token=1b8fb67a-6961-4ab3-ae49-9b7fb3e90a04)](https://github.com/msdio/stackticon)
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1717940616720?alt=media&token=e805aff5-a5f0-432d-a81d-e6c9b9537768)](https://github.com/msdio/stackticon)
 
 ## ERD
 ![erd](https://github.com/CloudSnack-WebIDE/web-ide-back/assets/113276452/c817945b-6911-4ceb-ba00-94a9c6603371)
