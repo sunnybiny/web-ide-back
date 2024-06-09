@@ -14,6 +14,8 @@
 ## 기술스텍
 
 ## ERD
+![erd](https://github.com/CloudSnack-WebIDE/web-ide-back/assets/113276452/c817945b-6911-4ceb-ba00-94a9c6603371)
+
 
 ## 아키텍쳐
 
