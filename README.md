@@ -15,8 +15,7 @@
 [![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1717940616720?alt=media&token=e805aff5-a5f0-432d-a81d-e6c9b9537768)](https://github.com/msdio/stackticon)
 
 ## ERD
-![erd](https://github.com/CloudSnack-WebIDE/web-ide-back/assets/113276452/c817945b-6911-4ceb-ba00-94a9c6603371)
-
+![erd](https://github.com/CloudSnack-WebIDE/web-ide-back/assets/42487844/d672be0d-9362-46c6-bf34-c92c85f35941)
 
 ## 아키텍쳐
 
