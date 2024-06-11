@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Project {
 
   @jakarta.persistence.Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long Id;
   private String name;
   private LocalDateTime createdAt;
