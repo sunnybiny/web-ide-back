@@ -80,42 +80,38 @@ public class ContainerService {
           new Adapter<>() {
             @Override
             public void onNext(Frame f) {
+              String output = new String(f.getPayload(), StandardCharsets.UTF_8);
               switch (f.getStreamType()) {
-                case STDOUT -> {
-                  String output = new String(f.getPayload(), StandardCharsets.UTF_8);
-                  codeResult.setStandardOutput(output);
-                }
-                case STDERR -> {
-                  String error = new String(f.getPayload(), StandardCharsets.UTF_8);
-                  codeResult.setStandardError(error);
-                }
+                case STDOUT -> codeResult.appendStandardOutput(output);
+                case STDERR -> codeResult.appendStandardError(output);
                 default -> log.error("Unknown stream type: {}", f.getStreamType());
               }
             }
           }
-      ).awaitCompletion(30, TimeUnit.SECONDS);
+      ).awaitCompletion(60, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       log.error("Interrupted while running code", e);
     }
+
     log.info("CodeResult: {}", codeResult);
     return codeResult;
   }
 
-  @Profile("local")
-  @Transactional
-  @PreDestroy
-  public void cleanup() {
-    log.info("Cleaning up containers...");
-    containerRepository.findAll().forEach(container -> {
-      try {
-        dockerClient.removeContainerCmd(container.getId()).withForce(true).exec();
-        userProjectRepository.deleteByProjectId(projectRepository.findByContainerId(container.getId()).getId());
-        log.info("Removed container: {}", container.getId());
-      } catch (Exception e) {
-        log.error("Failed to remove container: {}", container.getId(), e);
-      }
-    });
-  }
+//  @Profile("local")
+//  @Transactional
+//  @PreDestroy
+//  public void cleanup() {
+//    log.info("Cleaning up containers...");
+//    containerRepository.findAll().forEach(container -> {
+//      try {
+//        dockerClient.removeContainerCmd(container.getId()).withForce(true).exec();
+//        userProjectRepository.deleteByProjectId(projectRepository.findByContainerId(container.getId()).getId());
+//        log.info("Removed container: {}", container.getId());
+//      } catch (Exception e) {
+//        log.error("Failed to remove container: {}", container.getId(), e);
+//      }
+//    });
+//  }
 }
 
 
