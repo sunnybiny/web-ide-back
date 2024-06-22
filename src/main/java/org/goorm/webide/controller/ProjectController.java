@@ -75,18 +75,6 @@ public class ProjectController {
         return api;
     }
 
-    @GetMapping
-    public API<List<ProjectOverviewDto>> findAll(@RequestParam("userId") Long userId) {
-        List<ProjectOverviewDto> projects = projectService.findAll(userId);
-        API<List<ProjectOverviewDto>> api = API.<List<ProjectOverviewDto>>builder()
-            .data(projects)
-            .resultCode(HttpStatus.OK.toString())
-            .resultMessage(HttpStatus.OK.getReasonPhrase())
-            .build();
-
-        return api;
-    }
-
     @PostMapping
     public API<ProjectDto> create(@RequestBody ProjectCreateRequestDto request){
         //TODO : User 가 존재하지 않는 경우 예외처리

@@ -1,10 +1,13 @@
 package org.goorm.webide.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.goorm.webide.api.API;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.dto.requestDto.UserCreateRequestDto;
 import org.goorm.webide.dto.requestDto.UserUpdateRequestDto;
+import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
+import org.goorm.webide.service.ProjectService;
 import org.goorm.webide.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -23,9 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
     private final UserService userService;
+    private final ProjectService projectService;
 
     @GetMapping("/user")
-    public API<User> getCurrnetUser(@RequestParam("userId") Long userId) {
+    public API<User> getUser(@RequestParam("userId") Long userId) {
         User user = userService.find(userId);
         API<User> api = API.<User>builder()
                 .data(user)
@@ -37,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public API<User> create(@RequestBody @Validated UserCreateRequestDto request){
+    public API<User> createUser(@RequestBody @Validated UserCreateRequestDto request){
         User user = userService.create(request.getUsername(), request.getEmail(), request.getPassword());
         API<User> api = API.<User>builder()
                 .data(user)
@@ -49,7 +53,7 @@ public class UserController {
     }
 
     @PatchMapping("/user")
-    public API<User> update(@RequestParam("userId") Long userId, @RequestBody UserUpdateRequestDto request) {
+    public API<User> updateUser(@RequestParam("userId") Long userId, @RequestBody UserUpdateRequestDto request) {
         User user = userService.update(userId, request);
         API<User> api = API.<User>builder()
                 .data(user)
@@ -61,12 +65,24 @@ public class UserController {
     }
 
     @DeleteMapping("/user")
-    public API<?> delete(@RequestParam("userId") Long userId) {
+    public API<?> deleteUser(@RequestParam("userId") Long userId) {
         userService.delete(userId);
         API<?> api = API.<User>builder()
                 .resultCode(HttpStatus.OK.toString())
                 .resultMessage(HttpStatus.OK.getReasonPhrase())
                 .build();
+
+        return api;
+    }
+
+    @GetMapping
+    public API<List<ProjectOverviewDto>> getUserProjects(@RequestParam("userId") Long userId) {
+        List<ProjectOverviewDto> projects = projectService.findAll(userId);
+        API<List<ProjectOverviewDto>> api = API.<List<ProjectOverviewDto>>builder()
+            .data(projects)
+            .resultCode(HttpStatus.OK.toString())
+            .resultMessage(HttpStatus.OK.getReasonPhrase())
+            .build();
 
         return api;
     }
