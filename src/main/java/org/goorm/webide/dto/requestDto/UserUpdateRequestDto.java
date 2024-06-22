@@ -9,5 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonNaming(SnakeCaseStrategy.class)
 public class UserUpdateRequestDto {
+
     private String username;
+    private String email;
+    private String password;
 }

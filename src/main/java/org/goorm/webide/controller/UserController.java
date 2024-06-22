@@ -7,6 +7,7 @@ import org.goorm.webide.dto.requestDto.UserCreateRequestDto;
 import org.goorm.webide.dto.requestDto.UserUpdateRequestDto;
 import org.goorm.webide.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,8 +36,8 @@ public class UserController {
     }
 
     @PostMapping
-    public API<User> create(@RequestBody UserCreateRequestDto request){
-        User user = userService.create(request.getUsername(), request.getPassword());
+    public API<User> create(@RequestBody @Validated UserCreateRequestDto request){
+        User user = userService.create(request.getUsername(), request.getEmail(), request.getPassword());
         API<User> api = API.<User>builder()
                 .data(user)
                 .resultCode(HttpStatus.OK.toString())
