@@ -11,6 +11,7 @@ import org.goorm.webide.dto.requestDto.Source;
 import org.goorm.webide.dto.requestDto.ProjectCreateRequestDto;
 import org.goorm.webide.dto.requestDto.ProjectUpdateRequestDto;
 import org.goorm.webide.dto.responseDto.ProjectDto;
+import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
 import org.goorm.webide.service.ContainerService;
 import org.goorm.webide.service.MeetingService;
 import org.goorm.webide.service.ProjectService;
@@ -70,6 +71,18 @@ public class ProjectController {
                 .resultCode(HttpStatus.OK.toString())
                 .resultMessage(HttpStatus.OK.getReasonPhrase())
                 .build();
+
+        return api;
+    }
+
+    @GetMapping
+    public API<List<ProjectOverviewDto>> findAll(@RequestParam("userId") Long userId) {
+        List<ProjectOverviewDto> projects = projectService.findAll(userId);
+        API<List<ProjectOverviewDto>> api = API.<List<ProjectOverviewDto>>builder()
+            .data(projects)
+            .resultCode(HttpStatus.OK.toString())
+            .resultMessage(HttpStatus.OK.getReasonPhrase())
+            .build();
 
         return api;
     }

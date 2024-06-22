@@ -1,5 +1,6 @@
 package org.goorm.webide.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.Container;
@@ -7,6 +8,7 @@ import org.goorm.webide.domain.Project;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.domain.UserProject;
 import org.goorm.webide.dto.responseDto.ProjectDto;
+import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
 import org.goorm.webide.repository.ContainerRepository;
 import org.goorm.webide.repository.ProjectRepository;
 import org.goorm.webide.repository.UserProjectRepository;
@@ -28,6 +30,15 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId).orElseThrow();
 
         return new ProjectDto(project);
+    }
+
+    public List<ProjectOverviewDto> findAll(Long userId) {
+        List<UserProject> userProjects = userProjectRepository.findByUserId(userId);
+        return userProjects
+            .stream()
+            .map(UserProject::getProject)
+            .map(ProjectOverviewDto::new)
+            .toList();
     }
     
     @Transactional
