@@ -3,21 +3,18 @@ package org.goorm.webide.service;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback.Adapter;
 import com.github.dockerjava.api.model.Frame;
-import jakarta.annotation.PreDestroy;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.Container;
-import org.goorm.webide.model.requestDto.Source;
-import org.goorm.webide.model.responseDto.CodeResult;
+import org.goorm.webide.dto.requestDto.Source;
+import org.goorm.webide.dto.responseDto.CodeResult;
 import org.goorm.webide.repository.ContainerRepository;
 import org.goorm.webide.repository.ProjectRepository;
 import org.goorm.webide.repository.UserProjectRepository;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -47,8 +44,7 @@ public class ContainerService {
     return containerRepository.save(Container.createContainer(containerId, containerName, imageName));
   }
 
-  public CodeResult   runPythonCode(Long projectId, Source source) {
-    StringBuilder sb = new StringBuilder();
+  public CodeResult runPythonCode(Long projectId, Source source) {
     String[] saveSourceCommand = {"bash" , "-c", "echo '" + source.getSourceCode() + "' > main.py"};
     String[] runCommand = {"bash", "-c", "python3 main.py"};// 컴파일 명령
 
@@ -57,13 +53,45 @@ public class ContainerService {
         .getContainer()
         .getId();
 
-    CodeResult saveCodeResult = execCommand(containerId, saveSourceCommand, sb);
-    CodeResult runCodeResult = execCommand(containerId, runCommand, sb);
+    CodeResult saveCodeResult = execCommand(containerId, saveSourceCommand);
+    CodeResult runCodeResult = execCommand(containerId, runCommand);
 
     return runCodeResult;
   }
 
-  private CodeResult execCommand(String containerId, String[] command, StringBuilder sb) {
+  public CodeResult runJavaCode(Long projectId, Source source) {
+    String[] saveSourceCommand = {"bash", "-c", "echo '" + source.getSourceCode() + "' > Main.java"};
+    String[] compileCommand = {"bash", "-c", "javac Main.java"};
+    String[] runCommand = {"bash", "-c", "java Main"};
+
+    String containerId = projectRepository.findById(projectId)
+        .orElseThrow()
+        .getContainer()
+        .getId();
+
+    CodeResult saveCodeResult = execCommand(containerId, saveSourceCommand);
+    CodeResult compileCodeResult = execCommand(containerId, compileCommand);
+    CodeResult runCodeResult = execCommand(containerId, runCommand);
+
+    return runCodeResult;
+  }
+
+  public CodeResult runJavaScriptCode(Long projectId, Source source) {
+    String[] saveSourceCommand = {"bash", "-c", "echo '" + source.getSourceCode() + "' > main.js"};
+    String[] runCommand = {"bash", "-c", "node main.js"};
+
+    String containerId = projectRepository.findById(projectId)
+        .orElseThrow()
+        .getContainer()
+        .getId();
+
+    CodeResult saveCodeResult = execCommand(containerId, saveSourceCommand);
+    CodeResult runCodeResult = execCommand(containerId, runCommand);
+
+    return runCodeResult;
+  }
+
+  private CodeResult execCommand(String containerId, String[] command) {
     String execId = dockerClient.execCreateCmd(containerId)
         .withAttachStdin(true)
         .withAttachStdout(true)
@@ -84,7 +112,10 @@ public class ContainerService {
               switch (f.getStreamType()) {
                 case STDOUT -> codeResult.appendStandardOutput(output);
                 case STDERR -> codeResult.appendStandardError(output);
-                default -> log.error("Unknown stream type: {}", f.getStreamType());
+                default -> {
+                  log.error("Unknown stream type: {}", f.getStreamType());
+                  throw new IllegalStateException("Unknown stream type" + f.getStreamType().name());
+                }
               }
             }
           }
@@ -93,8 +124,16 @@ public class ContainerService {
       log.error("Interrupted while running code", e);
     }
 
-    log.info("CodeResult: {}", codeResult);
     return codeResult;
+  }
+
+  public void cleanContainer(String containerId) {
+    try {
+      log.info("Cleaning up container...");
+      dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+    } catch (Exception e) {
+      log.error("Failed to remove container: {}", containerId, e);
+    }
   }
 
 //  @Profile("local")

@@ -1,4 +1,4 @@
-package org.goorm.webide.model.requestDto;
+package org.goorm.webide.dto.requestDto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

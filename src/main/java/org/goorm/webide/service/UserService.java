@@ -3,7 +3,7 @@ package org.goorm.webide.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.User;
-import org.goorm.webide.model.requestDto.UserUpdateRequestDto;
+import org.goorm.webide.dto.requestDto.UserUpdateRequestDto;
 import org.goorm.webide.repository.UserRepository;
 import org.springframework.stereotype.Service;
 

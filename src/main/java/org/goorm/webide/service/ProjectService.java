@@ -6,7 +6,8 @@ import org.goorm.webide.domain.Container;
 import org.goorm.webide.domain.Project;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.domain.UserProject;
-import org.goorm.webide.model.responseDto.ProjectDto;
+import org.goorm.webide.dto.responseDto.ProjectDto;
+import org.goorm.webide.repository.ContainerRepository;
 import org.goorm.webide.repository.ProjectRepository;
 import org.goorm.webide.repository.UserProjectRepository;
 import org.goorm.webide.repository.UserRepository;
@@ -21,6 +22,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
     private final ContainerService containerService;
+    private final ContainerRepository containerRepository;
 
     public ProjectDto find(Long projectId) {
         Project project = projectRepository.findById(projectId).orElseThrow();
@@ -55,7 +57,7 @@ public class ProjectService {
         return new ProjectDto(project);
     }
 
-
+    @Transactional
     public ProjectDto update(String projectName, Long projectId) {
         Project project = projectRepository.findById(projectId).orElseThrow();
         project.setName(projectName);
@@ -64,7 +66,12 @@ public class ProjectService {
         return convertToDto(project);
     }
 
+    @Transactional
     public void delete(Long projectId) {
+        userProjectRepository.deleteByProjectId(projectId);
         projectRepository.deleteById(projectId);
+        String containerId = projectRepository.findById(projectId).orElseThrow().getContainer().getId();
+        containerService.cleanContainer(containerId);
+        containerRepository.deleteById(containerId);
     }
 }
