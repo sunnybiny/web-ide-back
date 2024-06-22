@@ -15,17 +15,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("api/users")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @RestController
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/{id}")
-    public API<User> find(@PathVariable Long id) {
-        User user = userService.find(id);
+    @GetMapping("/user")
+    public API<User> getCurrnetUser(@RequestParam("userId") Long userId) {
+        User user = userService.find(userId);
         API<User> api = API.<User>builder()
                 .data(user)
                 .resultCode(HttpStatus.OK.toString())
@@ -35,7 +36,7 @@ public class UserController {
         return api;
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public API<User> create(@RequestBody @Validated UserCreateRequestDto request){
         User user = userService.create(request.getUsername(), request.getEmail(), request.getPassword());
         API<User> api = API.<User>builder()
@@ -47,8 +48,8 @@ public class UserController {
         return api;
     }
 
-    @PatchMapping("/{userId}")
-    public API<User> update(@PathVariable Long userId, @RequestBody UserUpdateRequestDto request) {
+    @PatchMapping("/user")
+    public API<User> update(@RequestParam("userId") Long userId, @RequestBody UserUpdateRequestDto request) {
         User user = userService.update(userId, request);
         API<User> api = API.<User>builder()
                 .data(user)
@@ -59,8 +60,8 @@ public class UserController {
         return api;
     }
 
-    @DeleteMapping("/{userId}")
-    public API<?> delete(@PathVariable Long userId) {
+    @DeleteMapping("/user")
+    public API<?> delete(@RequestParam("userId") Long userId) {
         userService.delete(userId);
         API<?> api = API.<User>builder()
                 .resultCode(HttpStatus.OK.toString())
