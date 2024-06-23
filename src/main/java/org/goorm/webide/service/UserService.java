@@ -1,10 +1,15 @@
 package org.goorm.webide.service;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.goorm.webide.domain.Project;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.dto.requestDto.UserUpdateRequestDto;
+import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
+import org.goorm.webide.repository.ProjectRepository;
+import org.goorm.webide.repository.UserProjectRepository;
 import org.goorm.webide.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +21,7 @@ import org.springframework.util.StringUtils;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     public User find(Long id) {
         return userRepository.findById(id).orElseThrow();
@@ -64,6 +70,14 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public List<ProjectOverviewDto> findAllProjectsByUserId(Long userId) {
+        List<Project> projects = projectRepository.findAllByUserId(userId);
+        return projects
+            .stream()
+            .map(ProjectOverviewDto::new)
+            .toList();
     }
 
     private void validateUserUniqueness(String username, String email) {

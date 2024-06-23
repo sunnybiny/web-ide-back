@@ -75,9 +75,9 @@ public class UserController {
         return api;
     }
 
-    @GetMapping
+    @GetMapping("/user/projects")
     public API<List<ProjectOverviewDto>> getUserProjects(@RequestParam("userId") Long userId) {
-        List<ProjectOverviewDto> projects = projectService.findAll(userId);
+        List<ProjectOverviewDto> projects = userService.findAllProjectsByUserId(userId);
         API<List<ProjectOverviewDto>> api = API.<List<ProjectOverviewDto>>builder()
             .data(projects)
             .resultCode(HttpStatus.OK.toString())

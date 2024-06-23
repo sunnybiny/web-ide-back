@@ -1,11 +1,14 @@
 package org.goorm.webide.dto.responseDto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import lombok.Data;
 import org.goorm.webide.domain.Project;
 
 @Data
+@JsonNaming(SnakeCaseStrategy.class)
 public class ProjectOverviewDto {
   private Long id;
   private String name;
