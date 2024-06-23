@@ -1,16 +1,12 @@
 package org.goorm.webide.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +31,22 @@ public class User {
   private LocalDateTime createdAt;
 
   private Long profileImageId;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private UserRole role;
+
+  @Builder
+  public User(String name, String password, UserRole role){
+    this.name = name;
+    this.password = password;
+    this.role = role;
+
+  }
+
+  public String getRoleKey(){
+    return this.role.getKey();
+  }
 
   @PrePersist
   public void createdAt() {
