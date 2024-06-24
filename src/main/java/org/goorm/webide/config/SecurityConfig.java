@@ -32,8 +32,7 @@ public class SecurityConfig  {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth ->
             auth
-                .requestMatchers("/api/ws/**").permitAll()
-                .requestMatchers( "/api/login", "/api/sign-up").permitAll()
+                .requestMatchers( "/api/login", "/api/sign-up", "/api/ws/**", "/api/test").permitAll()
                 .requestMatchers("/api/user/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers("/api/logout").hasAnyAuthority("USER", "ADMIN")
                 .anyRequest().permitAll() // 서블릿은 허용해주는데 jwt 필터는 적용됨
