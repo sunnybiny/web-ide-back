@@ -6,7 +6,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.goorm.webide.domain.Meeting;
 import org.goorm.webide.domain.UserProject;
-import org.goorm.webide.domain.UserRole;
+import org.goorm.webide.domain.ProjectRole;
 import org.goorm.webide.dto.MeetingDto;
 import org.goorm.webide.dto.MeetingWriteRequestDto;
 import org.goorm.webide.exception.OngoingMeetingException;
@@ -126,7 +126,7 @@ public class MeetingService {
   }
 
   private void validateProjectLeader(UserProject userProject) {
-    if (userProject.getRole() != UserRole.LEADER) {
+    if (userProject.getRole() != ProjectRole.LEADER) {
       throw new AccessDeniedException("프로젝트의 관리자가 아닙니다.");
     }
   }
