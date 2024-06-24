@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtUtil{
   private final String SECRET_KEY = "d3200099cc45ea9c4685310c9057c4c1a301090773524c40b23b9538fee3a4d6056a149c7df720b61f3f1b08a3da38594179b0b429d6df9950180496977a08c3";
-  private final Long ACCESS_TOKEN_EXPIRATION_PERIOD = 1000L * 60 ; // 10분
+  private final Long ACCESS_TOKEN_EXPIRATION_PERIOD = 1000L * 60 * 30 ; // 30분
   private final Long REPRESH_TOKEN_EXPIRATION_PERIOD = 1000L * 60 * 60 * 24 * 7; // 1주
   private final UserRepository userRepository;
 
@@ -140,6 +140,4 @@ public class JwtUtil{
       return false;
     }
   }
-
-
 }
