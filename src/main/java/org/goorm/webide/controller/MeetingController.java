@@ -2,12 +2,14 @@ package org.goorm.webide.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.goorm.webide.api.API;
 import org.goorm.webide.domain.Meeting;
 import org.goorm.webide.dto.requestDto.MeetingWriteRequestDto;
 import org.goorm.webide.dto.responseDto.ChatMessageDto;
 import org.goorm.webide.dto.responseDto.MeetingDto;
 import org.goorm.webide.service.ChatService;
 import org.goorm.webide.service.MeetingService;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,31 +31,49 @@ public class MeetingController {
 
 
   @GetMapping("/{meetingId}")
-  public MeetingDto getMeeting(@PathVariable Long meetingId, @RequestParam("userId") Long userId) {
+  public API<MeetingDto> getMeeting(@PathVariable Long meetingId, @RequestParam("userId") Long userId) {
     Meeting meeting = meetingService.findMeeting(meetingId, userId);
-    return new MeetingDto(meeting);
+    MeetingDto meetingDto = new MeetingDto(meeting);
+    return API.<MeetingDto>builder()
+        .data(meetingDto)
+        .resultCode(HttpStatus.OK.toString())
+        .resultMessage(HttpStatus.OK.getReasonPhrase())
+        .build();
   }
 
   @PatchMapping("/{meetingId}")
-  public MeetingDto updateMeeting(@PathVariable Long meetingId, @RequestParam("userId") Long userId,
+  public API<MeetingDto> updateMeeting(@PathVariable Long meetingId, @RequestParam("userId") Long userId,
       @RequestBody MeetingWriteRequestDto requestDto) {
 
     MeetingDto meeting = meetingService.updateMeeting(meetingId, requestDto, userId);
     template.convertAndSend("/topic/meetings/" + meetingId + "/update", meeting);
-    return meeting;
+    return API.<MeetingDto>builder()
+        .data(meeting)
+        .resultCode(HttpStatus.OK.toString())
+        .resultMessage(HttpStatus.OK.getReasonPhrase())
+        .build();
   }
 
   @PostMapping("/{meetingId}/end")
-  public MeetingDto endMeeting(@PathVariable Long meetingId, @RequestParam("userId") Long userId) {
+  public API<MeetingDto> endMeeting(@PathVariable Long meetingId, @RequestParam("userId") Long userId) {
     MeetingDto meeting = meetingService.endMeeting(meetingId, userId);
     template.convertAndSend("/topic/meetings/" + meetingId + "/update", meeting);
-    return meeting;
+    return API.<MeetingDto>builder()
+        .data(meeting)
+        .resultCode(HttpStatus.OK.toString())
+        .resultMessage(HttpStatus.OK.getReasonPhrase())
+        .build();
   }
 
   @GetMapping("/{meetingId}/chatMessages")
-  public List<ChatMessageDto> getChatMessages(@PathVariable Long meetingId,
+  public API<List<ChatMessageDto>> getChatMessages(@PathVariable Long meetingId,
       @RequestParam("userId") Long userId) {
-    return chatService.findMessages(meetingId, userId);
+    List<ChatMessageDto> messages = chatService.findMessages(meetingId, userId);
+    return API.<List<ChatMessageDto>>builder()
+        .data(messages)
+        .resultCode(HttpStatus.OK.toString())
+        .resultMessage(HttpStatus.OK.getReasonPhrase())
+        .build();
   }
 
 }

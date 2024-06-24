@@ -60,9 +60,6 @@ public class User implements UserDetails {
   }
 
   @Enumerated(EnumType.STRING)
-  private ProjectRole projectRole;
-
-  @Enumerated(EnumType.STRING)
   private UserRole userRole;
 
   @PrePersist

@@ -33,12 +33,12 @@ public class UserProject{
   private Project project;
 
   @Enumerated(EnumType.STRING)
-  private ProjectRole role;
+  private ProjectRole projectRole;
 
 
-  public UserProject(User user, Project project, ProjectRole role){
+  public UserProject(User user, Project project, ProjectRole projectRole){
     this.user = user;
     this.project = project;
-    this.role = role;
+    this.projectRole = projectRole;
   }
 }

@@ -66,7 +66,7 @@ public class UserService implements UserDetailsService {
             user.getEmail(),
             accessToken,
             refreshToken,
-            user.getUserRole().name()
+            user.getUserRole()
         );
 
         return dto;
@@ -85,7 +85,6 @@ public class UserService implements UserDetailsService {
         return new UserSignupResponseDto(
             user.getId(),
             user.getName(),
-            password,
             user.getEmail(),
             user.getCreatedAt()
         );
@@ -121,9 +120,8 @@ public class UserService implements UserDetailsService {
         return new UserUpdateResponseDto(
             user.getId(),
             user.getName(),
-            user.getEmail(),
-            request.getPassword()
-            );
+            user.getEmail()
+        );
     }
 
     @Transactional

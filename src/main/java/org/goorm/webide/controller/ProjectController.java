@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("api/projects")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 @Slf4j
 public class ProjectController {
@@ -46,25 +46,39 @@ public class ProjectController {
     private final ContainerService containerService;
 
     @GetMapping("/{projectId}/meetings")
-    public List<MeetingDto> getMeetings(@PathVariable Long projectId,
-        @RequestParam("userId") Long userId) {
-        return meetingService.findMeetings(projectId, userId);
+    public API<List<MeetingDto>> getMeetings(@PathVariable Long projectId,
+        @AuthenticationPrincipal User user) {
+        List<MeetingDto> meetings = meetingService.findMeetings(projectId, user.getId());
+        return API.<List<MeetingDto>>builder()
+            .data(meetings)
+            .resultCode(HttpStatus.OK.toString())
+            .resultMessage(HttpStatus.OK.getReasonPhrase())
+            .build();
     }
 
     @GetMapping("/{projectId}/meetings/ongoing")
-    public MeetingDto getOngoingMeeting(@PathVariable Long projectId,
-        @RequestParam("userId") Long userId) {
-        return meetingService.findOngoingMeeting(projectId, userId);
+    public API<MeetingDto> getOngoingMeeting(@PathVariable Long projectId,
+        @AuthenticationPrincipal User user) {
+        MeetingDto ongoingMeeting = meetingService.findOngoingMeeting(projectId, user.getId());
+        return API.<MeetingDto>builder()
+            .data(ongoingMeeting)
+            .resultCode(HttpStatus.OK.toString())
+            .resultMessage(HttpStatus.OK.getReasonPhrase())
+            .build();
     }
 
     @PostMapping("/{projectId}/meetings")
-    public MeetingDto createMeeting(@PathVariable Long projectId,
-        @RequestParam("userId") Long userId,
+    public API<MeetingDto> createMeeting(@PathVariable Long projectId,
+        @AuthenticationPrincipal User user,
         @RequestBody MeetingWriteRequestDto requestDto) {
 
-        MeetingDto meeting = meetingService.createMeeting(projectId, requestDto, userId);
+        MeetingDto meeting = meetingService.createMeeting(projectId, requestDto, user.getId());
         template.convertAndSend("/topic/projects/" + projectId + "/newMeeting", meeting);
-        return meeting;
+        return API.<MeetingDto>builder()
+            .data(meeting)
+            .resultCode(HttpStatus.OK.toString())
+            .resultMessage(HttpStatus.OK.getReasonPhrase())
+            .build();
     }
 
     @GetMapping("/{projectId}")
@@ -90,19 +104,6 @@ public class ProjectController {
         return api;
     }
 
-
-    @GetMapping
-    public API<List<ProjectOverviewDto>> findAllProjectByUser(@AuthenticationPrincipal User user){
-        List<ProjectOverviewDto> projects = projectService.findAll(user);
-        API<List<ProjectOverviewDto>> api = API.<List<ProjectOverviewDto>>builder()
-            .data(projects)
-            .resultCode(HttpStatus.OK.toString())
-            .resultMessage(HttpStatus.OK.getReasonPhrase())
-            .build();
-
-        return api;
-    }
-
     @PostMapping
     public API<ProjectDto> create(
         @RequestBody ProjectCreateRequestDto request,
@@ -117,27 +118,6 @@ public class ProjectController {
 
         return api;
     }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<API<RuntimeException>> handleIllegalArgumentException(IllegalArgumentException e) {
-        API<RuntimeException> api = API.<RuntimeException>builder()
-                .resultCode(HttpStatus.BAD_REQUEST.toString())
-                .resultMessage(e.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(api);
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<API<RuntimeException>> handleIllegalStateException(IllegalStateException e) {
-        API<RuntimeException> api = API.<RuntimeException>builder()
-                .resultCode(HttpStatus.INTERNAL_SERVER_ERROR.toString())
-                .resultMessage(e.getMessage()) // TODO : 에러 메시지 수정
-                .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
-    }
-
 
     @PatchMapping("/{projectId}")
     public API<ProjectDto> update(@RequestBody ProjectUpdateRequestDto request,  @PathVariable Long projectId) {
@@ -176,8 +156,8 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/users")
-    public API<List<ProjectUserDto>> findProjectUsers(@PathVariable Long projectId, @RequestParam Long userId) {
-        List<ProjectUserDto> users = projectService.findAllUsersByProjectId(projectId, userId);
+    public API<List<ProjectUserDto>> findProjectUsers(@PathVariable Long projectId, @AuthenticationPrincipal User user) {
+        List<ProjectUserDto> users = projectService.findAllUsersByProjectId(projectId, user.getId());
         API<List<ProjectUserDto>> api = API.<List<ProjectUserDto>>builder()
             .data(users)
             .resultCode(HttpStatus.OK.toString())
@@ -185,5 +165,25 @@ public class ProjectController {
             .build();
 
         return api;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<API<RuntimeException>> handleIllegalArgumentException(IllegalArgumentException e) {
+        API<RuntimeException> api = API.<RuntimeException>builder()
+            .resultCode(HttpStatus.BAD_REQUEST.toString())
+            .resultMessage(e.getMessage())
+            .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(api);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<API<RuntimeException>> handleIllegalStateException(IllegalStateException e) {
+        API<RuntimeException> api = API.<RuntimeException>builder()
+            .resultCode(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+            .resultMessage(e.getMessage()) // TODO : 에러 메시지 수정
+            .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
     }
 }

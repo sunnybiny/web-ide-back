@@ -5,4 +5,4 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.LocalDateTime;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record UserSignupResponseDto(Long id, String name, String password, String email, LocalDateTime createdAt){}
+public record UserSignupResponseDto(Long id, String username, String email, LocalDateTime createdAt){}

@@ -40,10 +40,9 @@ public class ProjectService {
     }
 
     public List<ProjectOverviewDto> findAll(User user) {
-        List<UserProject> userProjects = userProjectRepository.findAllByUserId(user.getId());
+        List<Project> userProjects = projectRepository.findAllByUserId(user.getId());
         return userProjects
             .stream()
-            .map(UserProject::getProject)
             .map(ProjectOverviewDto::new)
             .toList();
     }
