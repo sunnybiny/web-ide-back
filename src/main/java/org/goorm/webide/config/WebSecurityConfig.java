@@ -81,8 +81,8 @@ public class WebSecurityConfig {
                         authorizeRequests
                                 .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 .requestMatchers("/", "/login/**").permitAll()
-                                .requestMatchers("/posts/**", "/api/v1/posts/**").hasRole(UserRole.MEMBER.name())
-                                .requestMatchers("/admins/**", "/api/v1/admins/**").hasRole(UserRole.LEADER.name())
+                                .requestMatchers("/posts/**", "/api/v1/posts/**").hasRole(UserRole.USER.name())
+                                .requestMatchers("/admins/**", "/api/v1/admins/**").hasRole(UserRole.ADMIN.name())
                                 .anyRequest().authenticated()
                 )// 3번
                 .exceptionHandling((exceptionConfig) ->

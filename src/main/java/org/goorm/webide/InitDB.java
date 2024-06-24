@@ -3,10 +3,7 @@ package org.goorm.webide;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.goorm.webide.domain.Project;
-import org.goorm.webide.domain.User;
-import org.goorm.webide.domain.UserProject;
-import org.goorm.webide.domain.UserRole;
+import org.goorm.webide.domain.*;
 import org.goorm.webide.repository.ChatMessageRepository;
 import org.goorm.webide.repository.MeetingRepository;
 import org.goorm.webide.repository.ProjectRepository;
@@ -60,12 +57,12 @@ public class InitDB {
       UserProject userProject1 = new UserProject();
       userProject1.setUser(user1);
       userProject1.setProject(project);
-      userProject1.setRole(UserRole.LEADER);
+      userProject1.setRole(ProjectRole.MEMBER);
 
       UserProject userProject2 = new UserProject();
       userProject2.setUser(user2);
       userProject2.setProject(project);
-      userProject2.setRole(UserRole.MEMBER);
+      userProject2.setRole(ProjectRole.LEADER);
 
       userProjectRepository.saveAll(List.of(userProject1, userProject2));
 
