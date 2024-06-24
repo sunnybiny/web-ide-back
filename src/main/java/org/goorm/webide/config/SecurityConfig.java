@@ -32,9 +32,9 @@ public class SecurityConfig  {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth ->
             auth
-                .requestMatchers( "/login", "/sign-up").permitAll()
-                .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/logout").hasAnyRole("USER", "ADMIN")
+                .requestMatchers( "/api/login", "/api/sign-up").permitAll()
+                .requestMatchers("/api/user/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/logout").hasAnyAuthority("USER", "ADMIN")
                 .anyRequest().permitAll() // 서블릿은 허용해주는데 jwt 필터는 적용됨
         )
         .sessionManagement(sm ->
@@ -45,8 +45,8 @@ public class SecurityConfig  {
 //        )
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(config -> {
-          config.logoutUrl("/logout");
-          config.logoutSuccessUrl("/login");
+          config.logoutUrl("/api/logout");
+          config.logoutSuccessUrl("/api/login");
           config.addLogoutHandler(
               (request, response, auth) ->
               {
