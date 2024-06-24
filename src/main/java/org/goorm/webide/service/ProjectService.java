@@ -1,6 +1,7 @@
 package org.goorm.webide.service;
 
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.Container;
@@ -9,6 +10,7 @@ import org.goorm.webide.domain.User;
 import org.goorm.webide.domain.UserProject;
 import org.goorm.webide.dto.responseDto.ProjectDto;
 import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
+import org.goorm.webide.dto.responseDto.ProjectUserDto;
 import org.goorm.webide.repository.ContainerRepository;
 import org.goorm.webide.repository.ProjectRepository;
 import org.goorm.webide.repository.UserProjectRepository;
@@ -25,6 +27,8 @@ public class ProjectService {
     private final UserProjectRepository userProjectRepository;
     private final ContainerService containerService;
     private final ContainerRepository containerRepository;
+    private final LiveUserService liveUserService;
+    private final UserProjectService userProjectService;
 
     public ProjectDto find(Long projectId) {
         Project project = projectRepository.findById(projectId).orElseThrow();
@@ -84,5 +88,20 @@ public class ProjectService {
         String containerId = projectRepository.findById(projectId).orElseThrow().getContainer().getId();
         containerService.cleanContainer(containerId);
         containerRepository.deleteById(containerId);
+    }
+
+    public List<ProjectUserDto> findAllUsersByProjectId(Long projectId, Long userId) {
+        userProjectService.findUserProject(projectId, userId);
+
+        List<User> users = userRepository.findAllByProjectId(projectId);
+
+        Set<Long> onlineUserIds = liveUserService.findOnlineUserIdsByProjectId(projectId);
+
+        return users.stream()
+            .map(user -> {
+                boolean isOnline = onlineUserIds.contains(user.getId());
+                return new ProjectUserDto(user, isOnline);
+            })
+            .toList();
     }
 }
