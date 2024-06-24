@@ -66,17 +66,17 @@ public class InitDB {
       UserProject userProject1 = new UserProject();
       userProject1.setUser(user1);
       userProject1.setProject(project1);
-      userProject1.setRole(ProjectRole.LEADER);
+      userProject1.setProjectRole(ProjectRole.LEADER);
 
       UserProject userProject2 = new UserProject();
       userProject2.setUser(user2);
       userProject2.setProject(project1);
-      userProject2.setRole(ProjectRole.MEMBER);
+      userProject2.setProjectRole(ProjectRole.MEMBER);
 
       UserProject userProject3 = new UserProject();
       userProject3.setUser(user1);
       userProject3.setProject(project2);
-      userProject3.setRole(ProjectRole.LEADER);
+      userProject3.setProjectRole(ProjectRole.LEADER);
 
       userProjectRepository.saveAll(List.of(userProject1, userProject2, userProject3));
 

@@ -120,7 +120,7 @@ public class MeetingService {
   }
 
   private void validateProjectLeader(UserProject userProject) {
-    if (userProject.getRole() != ProjectRole.LEADER) {
+    if (userProject.getProjectRole() != ProjectRole.LEADER) {
       throw new AccessDeniedException("프로젝트의 관리자가 아닙니다.");
     }
   }
