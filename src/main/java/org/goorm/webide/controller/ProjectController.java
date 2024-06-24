@@ -77,6 +77,7 @@ public class ProjectController {
         return api;
     }
 
+
     @GetMapping
     public API<List<ProjectOverviewDto>> findAllProjectByUser(@AuthenticationPrincipal User user){
         List<ProjectOverviewDto> projects = projectService.findAll(user);
