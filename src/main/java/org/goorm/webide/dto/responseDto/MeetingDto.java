@@ -1,11 +1,14 @@
-package org.goorm.webide.dto;
+package org.goorm.webide.dto.responseDto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import lombok.Data;
 import org.goorm.webide.domain.Meeting;
 
 @Data
+@JsonNaming(SnakeCaseStrategy.class)
 public class MeetingDto {
 
   private Long meetingId;

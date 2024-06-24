@@ -1,7 +1,7 @@
 package org.goorm.webide.exception;
 
 import lombok.Getter;
-import org.goorm.webide.dto.MeetingDto;
+import org.goorm.webide.dto.responseDto.MeetingDto;
 
 @Getter
 public class OngoingMeetingException extends RuntimeException {

@@ -6,12 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.ChatMessage;
 import org.goorm.webide.domain.Meeting;
 import org.goorm.webide.domain.User;
-import org.goorm.webide.dto.ChatMessageDto;
+import org.goorm.webide.dto.responseDto.ChatMessageDto;
 import org.goorm.webide.repository.ChatMessageRepository;
 import org.goorm.webide.repository.MeetingRepository;
-import org.goorm.webide.repository.UserProjectRepository;
 import org.goorm.webide.repository.UserRepository;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

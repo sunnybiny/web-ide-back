@@ -3,7 +3,7 @@ package org.goorm.webide.controller;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.goorm.webide.dto.ChatMessageDto;
+import org.goorm.webide.dto.responseDto.ChatMessageDto;
 import org.goorm.webide.service.ChatService;
 import org.goorm.webide.service.MeetingService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

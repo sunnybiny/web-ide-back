@@ -10,7 +10,7 @@ import org.goorm.webide.domain.User;
 public class ProjectUserDto {
   private Long id;
   private String name;
-  private boolean isOnline;
+  private Boolean isOnline;
 
   public ProjectUserDto(User user, boolean isOnline) {
     this.id = user.getId();

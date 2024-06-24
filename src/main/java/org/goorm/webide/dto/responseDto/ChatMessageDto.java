@@ -1,10 +1,13 @@
-package org.goorm.webide.dto;
+package org.goorm.webide.dto.responseDto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.ZoneOffset;
 import lombok.Data;
 import org.goorm.webide.domain.ChatMessage;
 
 @Data
+@JsonNaming(SnakeCaseStrategy.class)
 public class ChatMessageDto {
 
   private Long messageId;

@@ -1,6 +1,6 @@
 package org.goorm.webide.exception;
 
-import org.goorm.webide.dto.MeetingDto;
+import org.goorm.webide.dto.responseDto.MeetingDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
