@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.api.API;
 import org.goorm.webide.domain.User;
+import org.goorm.webide.dto.requestDto.ProjectJoinDto;
 import org.goorm.webide.dto.responseDto.MeetingDto;
 import org.goorm.webide.dto.requestDto.MeetingWriteRequestDto;
 import org.goorm.webide.dto.responseDto.CodeResult;
@@ -78,6 +79,17 @@ public class ProjectController {
         return api;
     }
 
+    @PostMapping("/join")
+    public API<?> JoinProject(ProjectJoinDto request, @AuthenticationPrincipal User user) {
+        projectService.join(request.getProjectId(), user);
+        API<?> api = API.builder()
+                .resultCode(HttpStatus.OK.toString())
+                .resultMessage(HttpStatus.OK.getReasonPhrase())
+                .build();
+
+        return api;
+    }
+
 
     @GetMapping
     public API<List<ProjectOverviewDto>> findAllProjectByUser(@AuthenticationPrincipal User user){
@@ -96,7 +108,7 @@ public class ProjectController {
         @RequestBody ProjectCreateRequestDto request,
         @AuthenticationPrincipal User user){
 
-        ProjectDto projectDto = projectService.create(request.getProjectName(), user);
+        ProjectDto projectDto = projectService.create(request.getName(), request.getDescription(),  user);
         API<ProjectDto> api = API.<ProjectDto>builder()
                 .data(projectDto)
                 .resultCode(HttpStatus.OK.toString())
@@ -128,8 +140,8 @@ public class ProjectController {
 
 
     @PatchMapping("/{projectId}")
-    public API<ProjectDto> update(@RequestBody ProjectUpdateRequestDto request, @PathVariable Long projectId) {
-        ProjectDto projectDto = projectService.update(request.getProjectName(), projectId);
+    public API<ProjectDto> update(@RequestBody ProjectUpdateRequestDto request,  @PathVariable Long projectId) {
+        ProjectDto projectDto = projectService.update(request.getProjectName(), request.getDescription() ,projectId);
         API<ProjectDto> api = API.<ProjectDto>builder()
                 .data(projectDto)
                 .resultCode(HttpStatus.OK.toString())
@@ -152,8 +164,8 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/container/run")
-    public API<CodeResult> execContainer(@PathVariable Long projectId, @RequestBody Source source) {
-        CodeResult codeResult = containerService.runPythonCode(projectId, source);
+    public API<CodeResult> execContainer(@PathVariable Long projectId, @AuthenticationPrincipal User user, @RequestBody Source source) {
+        CodeResult codeResult = containerService.runCode(projectId, user, source);
         API<CodeResult> api = API.<CodeResult>builder()
                 .data(codeResult)
                 .resultCode(HttpStatus.OK.toString())

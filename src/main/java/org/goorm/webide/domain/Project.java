@@ -62,13 +62,14 @@ public class Project {
     this.updatedAt = LocalDateTime.now();
   }
 
-  private Project(String name, Container container, User createdBy) {
+  private Project(String name, String description, Container container, User createdBy) {
     this.name = name;
+    this.description = description;
     this.container = container;
     this.createdBy = createdBy;
   }
 
-  public static Project createProject(String name, Container container, User createdBy) {
-    return new Project(name, container, createdBy);
+  public static Project createProject(String name, String description, Container container, User createdBy) {
+    return new Project(name, description, container, createdBy);
   }
 }

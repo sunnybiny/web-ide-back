@@ -36,8 +36,9 @@ public class UserProject{
   private ProjectRole role;
 
 
-  public UserProject(User user, Project project){
+  public UserProject(User user, Project project, ProjectRole role){
     this.user = user;
     this.project = project;
+    this.role = role;
   }
 }

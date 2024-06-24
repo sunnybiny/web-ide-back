@@ -32,10 +32,10 @@ public class SecurityConfig  {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth ->
             auth
-                .requestMatchers("/api/auth/**", "/login", "/sign-up").permitAll()
-                .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/logout").hasRole("USER")
-                .anyRequest().permitAll()
+                .requestMatchers( "/login", "/sign-up").permitAll()
+                .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/logout").hasAnyRole("USER", "ADMIN")
+                .anyRequest().permitAll() // 서블릿은 허용해주는데 jwt 필터는 적용됨
         )
         .sessionManagement(sm ->
             sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -70,7 +70,7 @@ public class SecurityConfig  {
                   response.setCharacterEncoding("UTF-8");
                   try {
                     response.getWriter().write("{\"error\": \"비정상적인 접근입니다\"}");
-                    response.flushBuffer();
+                    return;
                   } catch (IOException e) {
                     throw new RuntimeException(e);
                   }

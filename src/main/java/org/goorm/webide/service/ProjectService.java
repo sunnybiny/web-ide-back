@@ -1,13 +1,16 @@
 package org.goorm.webide.service;
 
+import jakarta.ws.rs.ForbiddenException;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.Container;
 import org.goorm.webide.domain.Project;
+import org.goorm.webide.domain.ProjectRole;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.domain.UserProject;
+import org.goorm.webide.dto.requestDto.ProjectJoinDto;
 import org.goorm.webide.dto.responseDto.ProjectDto;
 import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
 import org.goorm.webide.dto.responseDto.ProjectUserDto;
@@ -37,7 +40,7 @@ public class ProjectService {
     }
 
     public List<ProjectOverviewDto> findAll(User user) {
-        List<UserProject> userProjects = userProjectRepository.findByUserId(user.getId());
+        List<UserProject> userProjects = userProjectRepository.findAllByUserId(user.getId());
         return userProjects
             .stream()
             .map(UserProject::getProject)
@@ -46,10 +49,7 @@ public class ProjectService {
     }
     
     @Transactional
-    public ProjectDto create(String projectName , User creator) {
-
-        //TODO : 컨테이너 생성로직
-        // 프로젝트와 컨테이너 연결
+    public ProjectDto create(String projectName ,String description, User creator) {
 
         String imageName = "python:latest";
         Long userId = creator.getId();
@@ -60,10 +60,9 @@ public class ProjectService {
 
         // 도커 컨테이너 이름은 한국어나 특수문자를 사용할 수 없어서 사용자나 프로젝트 이름을 사용할 수 없음
         Container container = containerService.createAndRunContainer(imageName);
-        Project project = Project.createProject(projectName, container, creator);
-
+        Project project = Project.createProject(projectName, description, container, creator);
         projectRepository.save(project);
-        userProjectRepository.save(new UserProject(creator, project));
+        userProjectRepository.save(new UserProject(creator, project, ProjectRole.LEADER));
 
         return convertToDto(project);
     }
@@ -73,9 +72,24 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectDto update(String projectName, Long projectId) {
+    public void join(Long projectId, User user) {
+        Project project = projectRepository.findById(projectId).orElseThrow(
+            () -> new IllegalArgumentException("해당 프로젝트가 존재하지 않습니다.")
+        );
+
+        if (userProjectRepository.existsByUserIdAndProjectId(user.getId(), projectId)) {
+            return;
+        }
+
+        userProjectRepository.save(new UserProject(user, project, ProjectRole.MEMBER));
+    }
+
+    @Transactional
+    public ProjectDto update(String projectName, String description, Long projectId) {
+
         Project project = projectRepository.findById(projectId).orElseThrow();
         project.setName(projectName);
+        project.setDescription(description);
         projectRepository.save(project);
 
         return convertToDto(project);
@@ -83,9 +97,11 @@ public class ProjectService {
 
     @Transactional
     public void delete(Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow();
+        String containerId = project.getContainer().getId();
+
         userProjectRepository.deleteByProjectId(projectId);
         projectRepository.deleteById(projectId);
-        String containerId = projectRepository.findById(projectId).orElseThrow().getContainer().getId();
         containerService.cleanContainer(containerId);
         containerRepository.deleteById(containerId);
     }

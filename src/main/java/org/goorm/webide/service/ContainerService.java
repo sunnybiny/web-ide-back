@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.domain.Container;
+import org.goorm.webide.domain.User;
 import org.goorm.webide.dto.requestDto.Source;
 import org.goorm.webide.dto.responseDto.CodeResult;
 import org.goorm.webide.repository.ContainerRepository;
@@ -44,7 +45,28 @@ public class ContainerService {
     return containerRepository.save(Container.createContainer(containerId, containerName, imageName));
   }
 
-  public CodeResult runPythonCode(Long projectId, Source source) {
+  public CodeResult runCode(Long projectId, User user, Source source) {
+    if (userProjectRepository.findAllByUserId(user.getId()).stream().findAny().isEmpty()) {
+      throw new IllegalArgumentException("해당 유저가 만든 프로젝트가 존재하지 않습니다.");
+    }
+
+    switch (source.getLanguageType()) {
+      case "py" -> {
+        return runPythonCode(projectId, source);
+      }
+      case "java" -> {
+        return runJavaCode(projectId, source);
+      }
+      case "js" -> {
+        return runJavaScriptCode(projectId, source);
+      }
+      default -> {
+        throw new IllegalArgumentException("지원하지 않는 언어입니다.");
+      }
+    }
+  }
+
+  private CodeResult runPythonCode(Long projectId, Source source) {
     String[] saveSourceCommand = {"bash" , "-c", "echo '" + source.getSourceCode() + "' > main.py"};
     String[] runCommand = {"bash", "-c", "python3 main.py"};// 컴파일 명령
 

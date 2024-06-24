@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService implements UserDetailsService, LogoutHandler {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -144,25 +144,6 @@ public class UserService implements UserDetailsService, LogoutHandler {
         }
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("해당 이메일의 사용자가 이미 있습니다");
-        }
-    }
-
-    @Override
-    public void logout(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        Authentication authentication) {
-
-        String authorization = request.getHeader("Authorization");
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            String token = authorization.substring(7);
-            userRepository.findByEmail(jwtUtil.extractUserEmail(token))
-                .ifPresent(user -> {
-                    user.setIsRefreshTokenExpired(true);
-                    userRepository.save(user);
-                    });
-        }else {
-            throw new IllegalStateException("토큰이 없습니다.");
         }
     }
 }

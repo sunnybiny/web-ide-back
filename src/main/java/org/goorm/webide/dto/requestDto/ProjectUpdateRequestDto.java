@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ProjectUpdateRequestDto {
     @NotBlank
     private String projectName;
+    private String description;
 }
