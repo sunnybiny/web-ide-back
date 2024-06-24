@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goorm.webide.api.API;
+import org.goorm.webide.domain.User;
 import org.goorm.webide.dto.MeetingDto;
 import org.goorm.webide.dto.MeetingWriteRequestDto;
 import org.goorm.webide.dto.responseDto.CodeResult;
@@ -18,6 +19,7 @@ import org.goorm.webide.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,13 +77,25 @@ public class ProjectController {
         return api;
     }
 
-    @PostMapping
-    public API<ProjectDto> create(@RequestBody ProjectCreateRequestDto request){
-        //TODO : User 가 존재하지 않는 경우 예외처리
-        // 세션이 구현이 안되서 일단 아이디로 테스트
-        Long userId = 1L;
 
-        ProjectDto projectDto = projectService.create(request.getProjectName(), userId);
+    @GetMapping
+    public API<List<ProjectOverviewDto>> findAllProjectByUser(@AuthenticationPrincipal User user){
+        List<ProjectOverviewDto> projects = projectService.findAll(user);
+        API<List<ProjectOverviewDto>> api = API.<List<ProjectOverviewDto>>builder()
+            .data(projects)
+            .resultCode(HttpStatus.OK.toString())
+            .resultMessage(HttpStatus.OK.getReasonPhrase())
+            .build();
+
+        return api;
+    }
+
+    @PostMapping
+    public API<ProjectDto> create(
+        @RequestBody ProjectCreateRequestDto request,
+        @AuthenticationPrincipal User user){
+
+        ProjectDto projectDto = projectService.create(request.getProjectName(), user);
         API<ProjectDto> api = API.<ProjectDto>builder()
                 .data(projectDto)
                 .resultCode(HttpStatus.OK.toString())

@@ -33,7 +33,7 @@ public class UserProject{
   private Project project;
 
   @Enumerated(EnumType.STRING)
-  private UserRole role;
+  private ProjectRole role;
 
 
   public UserProject(User user, Project project){

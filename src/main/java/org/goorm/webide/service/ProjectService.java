@@ -32,8 +32,8 @@ public class ProjectService {
         return new ProjectDto(project);
     }
 
-    public List<ProjectOverviewDto> findAll(Long userId) {
-        List<UserProject> userProjects = userProjectRepository.findByUserId(userId);
+    public List<ProjectOverviewDto> findAll(User user) {
+        List<UserProject> userProjects = userProjectRepository.findByUserId(user.getId());
         return userProjects
             .stream()
             .map(UserProject::getProject)
@@ -42,18 +42,18 @@ public class ProjectService {
     }
     
     @Transactional
-    public ProjectDto create(String projectName , Long userId) {
+    public ProjectDto create(String projectName , User creator) {
 
         //TODO : 컨테이너 생성로직
         // 프로젝트와 컨테이너 연결
 
         String imageName = "python:latest";
+        Long userId = creator.getId();
 
         if (userProjectRepository.existsByUserIdAndProjectName(userId, projectName)) {
             throw new IllegalArgumentException("해당 유저가 만든 프로젝트 중에 같은 이름의 프로젝트가 이미 존재합니다.");
         }
 
-        User creator = userRepository.findById(userId).orElseThrow();
         // 도커 컨테이너 이름은 한국어나 특수문자를 사용할 수 없어서 사용자나 프로젝트 이름을 사용할 수 없음
         Container container = containerService.createAndRunContainer(imageName);
         Project project = Project.createProject(projectName, container, creator);
