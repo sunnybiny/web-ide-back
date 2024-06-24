@@ -47,24 +47,35 @@ public class InitDB {
 
       userRepository.saveAll(List.of(user1, user2));
 
-      Project project = new Project();
-      project.setName("my project");
-      project.setDescription("demo");
-      project.setCreatedBy(user1);
+      Project project1 = new Project();
+      project1.setName("my project");
+      project1.setDescription("demo");
+      project1.setCreatedBy(user1);
 
-      projectRepository.save(project);
+      Project project2 = new Project();
+      project2.setName("webide");
+      project2.setDescription("test");
+      project2.setCreatedBy(user1);
+
+      projectRepository.saveAll(List.of(project1, project2));
 
       UserProject userProject1 = new UserProject();
       userProject1.setUser(user1);
-      userProject1.setProject(project);
+
+      userProject1.setProject(project1);
       userProject1.setRole(ProjectRole.MEMBER);
 
       UserProject userProject2 = new UserProject();
       userProject2.setUser(user2);
-      userProject2.setProject(project);
-      userProject2.setRole(ProjectRole.LEADER);
+      userProject2.setProject(project1);
+      userProject2.setRole(ProjectRole.MEMBER);
 
-      userProjectRepository.saveAll(List.of(userProject1, userProject2));
+      UserProject userProject3 = new UserProject();
+      userProject3.setUser(user1);
+      userProject3.setProject(project2);
+      userProject3.setRole(ProjectRole.LEADER);
+
+      userProjectRepository.saveAll(List.of(userProject1, userProject2, userProject3));
 
     }
   }

@@ -25,11 +25,11 @@ public class MeetingService {
 
   private final MeetingRepository meetingRepository;
   private final ProjectRepository projectRepository;
-  private final UserProjectRepository userProjectRepository;
+  private final UserProjectService userProjectService;
 
   @Transactional
   public MeetingDto createMeeting(Long projectId, MeetingWriteRequestDto requestDto, Long userId) {
-    UserProject userProject = validateAndGetUserProject(projectId, userId);
+    UserProject userProject = userProjectService.findUserProject(projectId, userId);
 
     validateProjectLeader(userProject);
 
@@ -50,13 +50,13 @@ public class MeetingService {
     Meeting meeting = meetingRepository.findById(meetingId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회의입니다."));
 
-    validateAndGetUserProject(meeting.getProject().getId(), userId);
+    userProjectService.findUserProject(meeting.getProject().getId(), userId);
 
     return meeting;
   }
 
   public List<MeetingDto> findMeetings(Long projectId, Long userId) {
-    validateAndGetUserProject(projectId, userId);
+    userProjectService.findUserProject(projectId, userId);
 
     return meetingRepository.findByProjectId(projectId)
         .stream()
@@ -69,7 +69,7 @@ public class MeetingService {
     Meeting meeting = meetingRepository.findById(meetingId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회의입니다."));
 
-    UserProject userProject = validateAndGetUserProject(meeting.getProject().getId(), userId);
+    UserProject userProject = userProjectService.findUserProject(meeting.getProject().getId(), userId);
 
     validateProjectLeader(userProject);
 
@@ -94,7 +94,7 @@ public class MeetingService {
     Meeting meeting = meetingRepository.findById(meetingId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회의입니다."));
 
-    UserProject userProject = validateAndGetUserProject(meeting.getProject().getId(), userId);
+    UserProject userProject = userProjectService.findUserProject(meeting.getProject().getId(), userId);
 
     validateProjectLeader(userProject);
 
@@ -112,17 +112,12 @@ public class MeetingService {
   public MeetingDto findOngoingMeeting(Long projectId, Long userId) {
     // TODO: 프로젝트를 조회했을 때 미팅이 진행중인 지 반환 추가 (미팅이 진행중이지 않으면 null 반환)
 
-    validateAndGetUserProject(projectId, userId);
+    userProjectService.findUserProject(projectId, userId);
 
     Optional<Meeting> ongoingMeeting = meetingRepository.findByProjectIdAndEndedAtIsNull(
         projectId);
 
     return ongoingMeeting.map(MeetingDto::new).orElse(null);
-  }
-
-  private UserProject validateAndGetUserProject(Long projectId, Long userId) {
-    return userProjectRepository.findByUserIdAndProjectId(userId, projectId)
-        .orElseThrow(() -> new AccessDeniedException("프로젝트의 멤버가 아닙니다."));
   }
 
   private void validateProjectLeader(UserProject userProject) {

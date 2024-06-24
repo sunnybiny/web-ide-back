@@ -36,10 +36,12 @@ public class User implements UserDetails {
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
   private List<UserProject> userProjects = new ArrayList<>();
 
+  @Column(name="name",unique = true)
   private String name;
 
   private String password;
 
+  @Column(name="email",unique = true)
   private String email;
 
   @CreationTimestamp

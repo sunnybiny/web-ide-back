@@ -22,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatService {
 
   private final UserRepository userRepository;
-  private final UserProjectRepository userProjectRepository;
   private final MeetingRepository meetingRepository;
   private final ChatMessageRepository chatMessageRepository;
+  private final UserProjectService userProjectService;
 
   @Transactional
   public ChatMessageDto saveMessage(Long meetingId, Long senderId, String text) {
@@ -34,7 +34,7 @@ public class ChatService {
     User user = userRepository.findById(senderId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-    validateProjectMember(meeting.getProject().getId(), user.getId());
+    userProjectService.findUserProject(meeting.getProject().getId(), user.getId());
 
     if (meeting.isEnded()) {
       throw new IllegalStateException("이미 종료된 회의입니다.");
@@ -51,17 +51,12 @@ public class ChatService {
     Meeting meeting = meetingRepository.findById(meetingId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회의입니다."));
 
-    validateProjectMember(meeting.getProject().getId(), userId);
+    userProjectService.findUserProject(meeting.getProject().getId(), userId);
 
     return chatMessageRepository.findByMeetingId(meetingId)
         .stream()
         .map(ChatMessageDto::new)
         .toList();
-  }
-
-  private void validateProjectMember(Long projectId, Long userId) {
-    userProjectRepository.findByUserIdAndProjectId(userId, projectId)
-        .orElseThrow(() -> new AccessDeniedException("프로젝트의 멤버가 아닙니다."));
   }
 
 }

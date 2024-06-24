@@ -2,15 +2,21 @@ package org.goorm.webide.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.goorm.webide.auth.JwtUtil;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.goorm.webide.auth.JwtUtil;
+import org.goorm.webide.domain.Project;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.domain.UserRole;
 import org.goorm.webide.dto.requestDto.UserUpdateRequestDto;
 import org.goorm.webide.dto.responseDto.UserLoginResponseDto;
 import org.goorm.webide.dto.responseDto.UserSignupResponseDto;
 import org.goorm.webide.dto.responseDto.UserUpdateResponseDto;
+import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
+import org.goorm.webide.repository.ProjectRepository;
+import org.goorm.webide.repository.UserProjectRepository;
 import org.goorm.webide.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +34,7 @@ public class UserService implements UserDetailsService, LogoutHandler {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final ProjectRepository projectRepository;
 
     public User find(Long id) {
         return userRepository.findById(id).orElseThrow();
@@ -122,6 +129,15 @@ public class UserService implements UserDetailsService, LogoutHandler {
     @Transactional
     public void delete(Long id) {userRepository.deleteById(id);
     }
+
+    public List<ProjectOverviewDto> findAllProjectsByUserId(Long userId) {
+        List<Project> projects = projectRepository.findAllByUserId(userId);
+        return projects
+            .stream()
+            .map(ProjectOverviewDto::new)
+            .toList();
+    }
+
     private void validateUserUniqueness(String username, String email) {
         if (userRepository.findByName(username).isPresent()) {
             throw new IllegalArgumentException("해당 이름의 사용자가 이미 있습니다.");
