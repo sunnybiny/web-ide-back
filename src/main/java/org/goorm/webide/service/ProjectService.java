@@ -1,6 +1,5 @@
 package org.goorm.webide.service;
 
-import jakarta.ws.rs.ForbiddenException;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,6 @@ import org.goorm.webide.domain.Project;
 import org.goorm.webide.domain.ProjectRole;
 import org.goorm.webide.domain.User;
 import org.goorm.webide.domain.UserProject;
-import org.goorm.webide.dto.requestDto.ProjectJoinDto;
 import org.goorm.webide.dto.responseDto.ProjectDto;
 import org.goorm.webide.dto.responseDto.ProjectOverviewDto;
 import org.goorm.webide.dto.responseDto.ProjectUserDto;
@@ -33,10 +31,11 @@ public class ProjectService {
     private final LiveUserService liveUserService;
     private final UserProjectService userProjectService;
 
+    @Transactional
     public ProjectDto find(Long projectId) {
         Project project = projectRepository.findById(projectId).orElseThrow();
 
-        return new ProjectDto(project);
+        return new ProjectDto(project, project.getCreatedBy());
     }
 
     public List<ProjectOverviewDto> findAll(User user) {
@@ -58,7 +57,12 @@ public class ProjectService {
         }
 
         // 도커 컨테이너 이름은 한국어나 특수문자를 사용할 수 없어서 사용자나 프로젝트 이름을 사용할 수 없음
-        Container container = containerService.createAndRunContainer(imageName);
+        Container container = null;
+        try {
+            container = containerService.createAndRunContainer(imageName);
+        } catch (Exception ignored) {
+        }
+
         Project project = Project.createProject(projectName, description, container, creator);
         projectRepository.save(project);
         userProjectRepository.save(new UserProject(creator, project, ProjectRole.LEADER));
@@ -66,8 +70,9 @@ public class ProjectService {
         return convertToDto(project);
     }
 
+    @Transactional
     private ProjectDto convertToDto(Project project) {
-        return new ProjectDto(project);
+        return new ProjectDto(project, project.getCreatedBy());
     }
 
     @Transactional

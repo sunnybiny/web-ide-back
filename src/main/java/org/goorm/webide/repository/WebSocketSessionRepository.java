@@ -17,7 +17,6 @@ public class WebSocketSessionRepository {
   private final Map<String, Set<Long>> projectIdsBySessionId = new ConcurrentHashMap<>();
 
   private final Map<String, Long> userIdBySessionId = new ConcurrentHashMap<>();
-  private final Map<String, Set<String>> sessionIdsByHttpSessionId = new ConcurrentHashMap<>();
 
 
   private String createProjectUserIdKey(Long projectId, Long userId) {
@@ -113,23 +112,12 @@ public class WebSocketSessionRepository {
     userIdBySessionId.put(sessionId, userId);
   }
 
-  public void removeSessionUser(String sessionId) {
-    userIdBySessionId.remove(sessionId);
+  public Long findSessionUser(String sessionId) {
+    return userIdBySessionId.get(sessionId);
   }
 
-  public void addSessionToHttpSession(String httpSessionId, String sessionId) {
-    sessionIdsByHttpSessionId.computeIfAbsent(httpSessionId, k -> ConcurrentHashMap.newKeySet()).add(sessionId);
+  public Long removeSessionUser(String sessionId) {
+    return userIdBySessionId.remove(sessionId);
   }
 
-  public void removeSessionFromHttpSession(String httpSessionId, String sessionId) {
-    Set<String> sessionIds = sessionIdsByHttpSessionId.getOrDefault(httpSessionId, new HashSet<>());
-    sessionIds.remove(sessionId);
-    if (sessionIds.isEmpty()) {
-      sessionIdsByHttpSessionId.remove(httpSessionId);
-    }
-  }
-
-  public Set<String> findAllSessionIdsByHttpSessionId(String httpSessionId) {
-    return sessionIdsByHttpSessionId.getOrDefault(httpSessionId, new HashSet<>());
-  }
 }

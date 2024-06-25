@@ -2,6 +2,7 @@ package org.goorm.webide.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.goorm.webide.auth.JwtFilter;
 import org.goorm.webide.auth.JwtUtil;
@@ -17,6 +18,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -26,9 +31,23 @@ public class SecurityConfig  {
   private final JwtUtil jwtUtil;
 
   @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+
+    config.setAllowCredentials(true);
+    config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+    config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
+    config.setAllowedHeaders(Arrays.asList("*"));
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+  }
+
+  @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http, UserRepository userRepository) throws Exception{
    return http
-        .cors(Customizer.withDefaults())
+        .cors(cors-> cors.configurationSource(corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth ->
             auth
