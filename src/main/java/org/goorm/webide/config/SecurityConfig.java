@@ -3,6 +3,7 @@ package org.goorm.webide.config;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.goorm.webide.auth.JwtFilter;
 import org.goorm.webide.auth.JwtUtil;
@@ -35,7 +36,8 @@ public class SecurityConfig  {
     CorsConfiguration config = new CorsConfiguration();
 
     config.setAllowCredentials(true);
-    config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://kd438d3d42851a.user-app.krampoline.com"));
     config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
     config.setAllowedHeaders(Arrays.asList("*"));
 
